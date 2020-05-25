@@ -1,0 +1,22 @@
+{
+    "manifest_version": 2,
+    "name": "Addify",
+    "version": "1.0",
+
+    "description": "Adds a toolbar icon that searches Spotify for whatever Youtube video song is opened.",
+    "icons": {
+        "48": "icons/toolbar-icon-48.png"
+    },
+
+    "permissions": [
+        "activeTab",
+        "tabs",
+        "<all_urls>"
+    ],
+
+    "browser_action":{
+        "default_icon": "icons/toolbar-icon-32.png",
+        "default_title": "Addify",
+        "default_popup": "popup/addify.html"
+    }
+}
