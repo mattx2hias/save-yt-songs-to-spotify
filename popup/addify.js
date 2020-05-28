@@ -16,6 +16,11 @@ function getvidTitle(tabs) {
   .then(data => {
     vidTitle = JSON.stringify(data.title);
     document.getElementById("vid-name").innerHTML = vidTitle;
+    // modify video title for better search results
+    //vidTitle = vidTitle.replace('ft.', '');
+    vidTitle = vidTitle.replace(/ *\([^)]*\) */g, ''); // remove text in parentheses
+    vidTitle = vidTitle.replace(/[^a-zA-Z0-9]/g,' '); // remove all special characters
+    //alert(vidTitle);
     authenticate();
   });
 }
@@ -24,10 +29,9 @@ function getvidTitle(tabs) {
 function authenticate() {
   let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=token&state=123';
   let winRef = window.open(spotURL);
-  setTimeout(() => {
-    let tab = browser.tabs.query({currentWindow: true, active: true});
-    tab.then(getAccessToken);
-  } ,2000); // pause to open spotify page
+  let tab = browser.tabs.query({currentWindow: true, active: true});
+  tab.then(getAccessToken);
+  winRef.close();
 }
 
 // retrieves url of active tab and gets authentication token using substr on url
@@ -41,7 +45,7 @@ function getAccessToken(tab) {
 function getSpotifyInfo(accessToken) {
   document.getElementById('track').innerHTML = 'Track';
   document.getElementById('artist').innerHTML = 'Artist';
-  fetch('https://api.spotify.com/v1/search?q='+vidTitle+'&type=track&limit=3', {
+  fetch('https://api.spotify.com/v1/search?q='+vidTitle+'&type=track&limit=5', {
     method: 'GET',
     headers: {
       'Authorization': 'Bearer ' + accessToken
