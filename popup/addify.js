@@ -28,10 +28,11 @@ function getvidTitle(tabs) {
 // opens spotify authorize page
 function authenticate() {
   let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=token&state=123';
-  let winRef = window.open(spotURL);
-  let tab = browser.tabs.query({currentWindow: true, active: true});
-  tab.then(getAccessToken);
-  winRef.close();
+  window.open(spotURL);
+  setTimeout(() => {
+    let tab = browser.tabs.query({currentWindow: true, active: true});
+    tab.then(getAccessToken);
+  }, 1000) // delay to let popup to load
 }
 
 // retrieves url of active tab and gets authentication token using substr on url
