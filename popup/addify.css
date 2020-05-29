@@ -22,24 +22,36 @@ html, body {
 }
 #vid-name {
     color: white;
-    background-color: black;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 20px;
 }
 #track1, #track2, #track3, #track4, #track5 {
-    color: white;
-}
-#artist1, #artist2, #artist3, #artist4, #artist5 {
     color: rgb(30, 215, 96);
 }
-#track{
+#artist1, #artist2, #artist3, #artist4, #artist5 {
+    color: rgb(255, 0, 0);;
+}
+#track, #artist, #add{
     color: white;
+}
+#track {
+    grid-column-start: 1;
+    grid-column-end: 2;
 }
 #artist {
-    color: white;
+    grid-column-start: 2;
+    grid-column-end: 3;
 }
-#col {
-    column-count: 2;
+#add {
+    grid-column-start: 3;
+    grid-column-end: 4;
+}
+.grid-container {
+    display: grid;
+}
+#add1, #add2, #add3 {
+    size: 25px;
+   
 }
