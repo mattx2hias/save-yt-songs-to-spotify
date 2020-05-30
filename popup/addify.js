@@ -3,8 +3,6 @@ let scopes = 'user-library-modify';
 let redirectURI = 'https://www.spotify.com/us/';
 let vidTitle;
 
-document.getElementById('add-song').addEventListener('click', getURL);
-
 function getURL() {
     let activeTab = browser.tabs.query({currentWindow: true, active: true});
     activeTab.then(getvidTitle);
@@ -108,3 +106,5 @@ function addToLibrary(accessToken, trackID) {
   })
     .catch(error => alert('Could not add song'))
 }
+
+getURL();
