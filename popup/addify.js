@@ -14,13 +14,14 @@ function checkStoredSettings() {
     } else if (refreshToken === undefined) {
       getRefreshToken();
     }  else {
+      //getVidTitle();
       refreshAccessToken();
     }
   }); 
 }
 
 
-function getVidTitle() {
+function getVidTitle(accessToken) {
   let tab = browser.tabs.query({currentWindow: true, active: true})  
   tab.then((tab) => {
     let url = 'https://www.youtube.com/oembed?url=' + tab[0].url + '&format=json';
@@ -30,9 +31,11 @@ function getVidTitle() {
     vidTitle = JSON.stringify(data.title);
     document.getElementById("vid-name").innerHTML = vidTitle;
     // modify video title for better search results
+    vidTitle = vidTitle.replace(/Nightcore/g, '');
     vidTitle = vidTitle.replace(/ *\([^)]*\) */g, ''); // remove text in parentheses
     vidTitle = vidTitle.replace(/[^a-zA-Z0-9]/g,' '); // remove all special characters
     //alert(vidTitle);
+    getSpotifyInfo(accessToken, vidTitle);
     })
   }) 
 }
@@ -101,8 +104,7 @@ function refreshAccessToken() {
     }).then(res => res.json()).then(res => {
        
     let accessToken = res.access_token; // new access token
-    getVidTitle();
-    getSpotifyInfo(accessToken);
+    getVidTitle(accessToken);
     })
   })
 }
@@ -120,14 +122,14 @@ function getSpotifyInfo(accessToken) {
     }
   }).then(res => res.json())
   .then(res => {
-    //alert(JSON.stringify(res));
-     document.getElementById('track1').innerHTML = JSON.stringify(res.tracks.items[0].name);
-     document.getElementById('track2').innerHTML = JSON.stringify(res.tracks.items[1].name);
-     document.getElementById('track3').innerHTML = JSON.stringify(res.tracks.items[2].name);
+    //alert(res);
+     document.getElementById('track1').innerHTML = res.tracks.items[0].name;
+     document.getElementById('track2').innerHTML = res.tracks.items[1].name;
+     document.getElementById('track3').innerHTML = res.tracks.items[2].name;
 
-     document.getElementById('artist1').innerHTML = JSON.stringify(res.tracks.items[0].album.artists[0].name);
-     document.getElementById('artist2').innerHTML = JSON.stringify(res.tracks.items[1].album.artists[0].name);
-     document.getElementById('artist3').innerHTML = JSON.stringify(res.tracks.items[2].album.artists[0].name);
+     document.getElementById('artist1').innerHTML = res.tracks.items[0].album.artists[0].name;
+     document.getElementById('artist2').innerHTML = res.tracks.items[1].album.artists[0].name;
+     document.getElementById('artist3').innerHTML = res.tracks.items[2].album.artists[0].name;
 
      let trackID1 = res.tracks.items[0].id;
      let trackID2 = res.tracks.items[1].id;
