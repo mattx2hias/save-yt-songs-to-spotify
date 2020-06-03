@@ -28,7 +28,7 @@ function getVidTitle(accessToken) {
 
     fetch(url).then(response => response.json())
     .then(data => {
-    vidTitle = JSON.stringify(data.title);
+    vidTitle = data.title;
     document.getElementById("vid-name").innerHTML = vidTitle;
     // modify video title for better search results
     vidTitle = vidTitle.replace(/Nightcore/g, '');
