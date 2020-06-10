@@ -1,5 +1,4 @@
-# addify
-A Firefox extension that gets the title of the opened Youtube video, searches Spotify and displays search results in the extension popup. You can then add the songs to your Spotify library.
+![](addify-demo1.png)
 
 # to-do list
 option to add song result to playlist\
