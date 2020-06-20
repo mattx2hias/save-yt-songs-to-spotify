@@ -37,6 +37,7 @@ html, body {
 .grid-container {
     display: grid;
     column-gap: 10px;
+    row-gap: 5px;
     grid-template-columns: 225px 225px 30px;
 }
 #add1, #add2, #add3 {
