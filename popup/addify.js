@@ -3,23 +3,23 @@ let scopes = 'user-library-modify';
 let redirectURI = 'https://www.spotify.com/us/';
 let vidTitle;
 
+// call this fcn on every extension button press
 function checkStoredSettings() {
-  //alert();
   let getItem = browser.storage.local.get();
-  getItem.then(res => {
-    let authCode = res.authorization_code;
-    let refreshToken = res.refresh_token;
-    if (authCode === undefined || authCode == '') {
-      authorize();
-    } else if (refreshToken === undefined) {
-      getRefreshToken();
-    }  else {
-      //getVidTitle();
-      refreshAccessToken();
-    }
-  }); 
-}
 
+  getItem.then(res => {
+      let authCode = res.authorization_code;
+      //console.log(authCode);
+
+      if (authCode === undefined || authCode == '') {
+          authorize();
+          // wait for tab to load
+          getAuthCode();
+      } else {
+          refreshAccessToken();
+      } 
+  })
+}
 
 function getVidTitle(accessToken) {
   let tab = browser.tabs.query({currentWindow: true, active: true})  
@@ -34,7 +34,6 @@ function getVidTitle(accessToken) {
     vidTitle = vidTitle.replace(/Nightcore/g, '');
     vidTitle = vidTitle.replace(/ *\([^)]*\) */g, ''); // remove text in parentheses
     vidTitle = vidTitle.replace(/[^a-zA-Z0-9]/g,' '); // remove all special characters
-    //alert(vidTitle);
     getSpotifyInfo(accessToken, vidTitle);
     })
   }) 
@@ -42,13 +41,14 @@ function getVidTitle(accessToken) {
 
 // opens spotify authorize page
 function authorize() {
+  //document.getElementById("vid-name").innerHTML = 'Allow Addify to access some account info.';
+  
   let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=code&state=123';
+
   window.open(spotURL);
-  setTimeout(getAuthCode(), 2000);
 }
 
 function getAuthCode() {
-  alert();
   browser.tabs.query({currentWindow: true, active: true})
   .then(function(tabs) {
     let url = tabs[0].url;
@@ -58,17 +58,17 @@ function getAuthCode() {
     authorization_code: authCode
     })
 
+    //document.getElementById("vid-name").innerHTML = 'Authorization code received.';
+
     getRefreshToken();
   })
 }
 
 // send authorization code to Spotify api to get refresh token
 function getRefreshToken() {
-  //alert('getRefreshToken');
   let getItem = browser.storage.local.get();
   getItem.then(res => {
     let authCode = res.authorization_code;
-    //alert(authCode);
     let payload = 'grant_type=authorization_code&code='+authCode+'&redirect_uri='+redirectURI;
     fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
@@ -78,7 +78,6 @@ function getRefreshToken() {
     },
     body: payload
     }).then(res => res.json()).then(res => {
-      //alert(JSON.stringify(res));
       let refreshToken = res.refresh_token;
       browser.storage.local.set({
         refresh_token: refreshToken
@@ -89,7 +88,6 @@ function getRefreshToken() {
 
 // send refresh token to Spotify api to get new access token
 function refreshAccessToken() {
-  //alert('refreshAccessToken');
   let getItem = browser.storage.local.get();
   getItem.then(res => {
     let refreshToken = res.refresh_token;
@@ -114,7 +112,6 @@ function getSpotifyInfo(accessToken) {
   document.getElementById('track').innerHTML = 'Song';
   document.getElementById('artist').innerHTML = 'Artist';
   //document.getElementById('add').innerHTML = 'Add Song';
-  //alert(accessToken);
   fetch('https://api.spotify.com/v1/search?q='+vidTitle+'&type=track&limit=3', {
     method: 'GET',
     headers: {
@@ -122,7 +119,10 @@ function getSpotifyInfo(accessToken) {
     }
   }).then(res => res.json())
   .then(res => {
-    //alert(res);
+    if (res.tracks.items[0] === undefined) {
+      alert('Song not found.');
+    }
+
      document.getElementById('track1').innerHTML = res.tracks.items[0].name;
      document.getElementById('track2').innerHTML = res.tracks.items[1].name;
      document.getElementById('track3').innerHTML = res.tracks.items[2].name;
@@ -159,7 +159,6 @@ function addToLibrary(accessToken, trackID) {
   let payload = {
     ids: ID
   }
-  //alert(payload.ids);
   fetch('https://api.spotify.com/v1/me/tracks', {
     method: 'PUT',
     headers: {
@@ -177,5 +176,3 @@ function addToLibrary(accessToken, trackID) {
   })
     .catch(error => alert('Could not add song'))
 }
-
-document.addEventListener('DOMContentLoaded', checkStoredSettings);
