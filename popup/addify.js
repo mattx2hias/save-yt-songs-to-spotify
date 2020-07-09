@@ -9,9 +9,14 @@ function checkStoredSettings() {
 
   getItem.then(res => {
       let authCode = res.authorization_code;
-      console.log(authCode);
+      let authCheck = res.authorization_check;
+      console.log(authCheck);
+      if (authCheck === 'yes' && authCode == undefined) {
+        let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=code&state=123';
+        window.open(spotURL);
 
-      if (authCode === undefined || authCode == '' || !authCode.startsWith('A')) {
+        setTimeout(getAuthCode, 2000);
+      } else if (authCheck == undefined) {
           authorize();
       } else {
           refreshAccessToken();
@@ -41,16 +46,19 @@ function getVidTitle(accessToken) {
 // opens spotify authorize page
 function authorize() {
   console.log('authorize');
-  //document.getElementById("vid-name").innerHTML = 'Allow Addify to access some account info.';
-  
+  document.getElementById("vid-name").innerHTML = 'Allow Addify to access some account info.';
   let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=code&state=123';
   window.open(spotURL);
-  
-  setTimeout(getAuthCode, 2000);
+  browser.storage.local.set({
+    authorization_check: 'yes'
+    })
 }
 
 function getAuthCode() {
   console.log('getAuthCode');
+
+  
+
   browser.tabs.query({currentWindow: true, active: true})
   .then(function(tabs) {
     let url = tabs[0].url;
@@ -59,9 +67,7 @@ function getAuthCode() {
     browser.storage.local.set({
     authorization_code: authCode
     })
-
-    //document.getElementById("vid-name").innerHTML = 'Authorization code received.';
-
+    document.getElementById("vid-name").innerHTML = 'Authorization code received.';
     getRefreshToken();
   })
 }
