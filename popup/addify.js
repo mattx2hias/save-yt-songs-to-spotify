@@ -9,12 +9,10 @@ function checkStoredSettings() {
 
   getItem.then(res => {
       let authCode = res.authorization_code;
-      //console.log(authCode);
+      console.log(authCode);
 
-      if (authCode === undefined || authCode == '') {
+      if (authCode === undefined || authCode == '' || !authCode.startsWith('A')) {
           authorize();
-          // wait for tab to load
-          getAuthCode();
       } else {
           refreshAccessToken();
       } 
@@ -22,6 +20,7 @@ function checkStoredSettings() {
 }
 
 function getVidTitle(accessToken) {
+  console.log('getVidTitle');
   let tab = browser.tabs.query({currentWindow: true, active: true})  
   tab.then((tab) => {
     let url = 'https://www.youtube.com/oembed?url=' + tab[0].url + '&format=json';
@@ -41,14 +40,17 @@ function getVidTitle(accessToken) {
 
 // opens spotify authorize page
 function authorize() {
+  console.log('authorize');
   //document.getElementById("vid-name").innerHTML = 'Allow Addify to access some account info.';
   
   let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=code&state=123';
-
   window.open(spotURL);
+  
+  setTimeout(getAuthCode, 2000);
 }
 
 function getAuthCode() {
+  console.log('getAuthCode');
   browser.tabs.query({currentWindow: true, active: true})
   .then(function(tabs) {
     let url = tabs[0].url;
@@ -66,6 +68,7 @@ function getAuthCode() {
 
 // send authorization code to Spotify api to get refresh token
 function getRefreshToken() {
+  console.log('getRefreshToken');
   let getItem = browser.storage.local.get();
   getItem.then(res => {
     let authCode = res.authorization_code;
@@ -88,6 +91,7 @@ function getRefreshToken() {
 
 // send refresh token to Spotify api to get new access token
 function refreshAccessToken() {
+  console.log('refreshAccessToken');
   let getItem = browser.storage.local.get();
   getItem.then(res => {
     let refreshToken = res.refresh_token;
@@ -176,3 +180,5 @@ function addToLibrary(accessToken, trackID) {
   })
     .catch(error => alert('Could not add song'))
 }
+
+checkStoredSettings();

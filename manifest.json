@@ -14,10 +14,6 @@
         "storage"
     ],
 
-    "background": {
-        "scripts": ["background/background.js"]
-    },
-
     "browser_action":{
         "default_icon": "icons/toolbar-icon-32.png",
         "default_title": "Addify",
