@@ -34,6 +34,12 @@ html, body {
     grid-column-end: 4;
 
 }
+#version {
+    color: rgb(96, 96, 96);
+    font-size: 10px;
+    grid-column-start: 2;
+    grid-column-end: 3;
+}
 .grid-container {
     display: grid;
     column-gap: 10px;
@@ -51,4 +57,9 @@ button {
 } 
 button:hover {
     border-color: rgb(30, 215, 96);
+}
+#song-not-found {
+    color: white;
+    grid-column-start: 2;
+    grid-column-end: 3;
 }

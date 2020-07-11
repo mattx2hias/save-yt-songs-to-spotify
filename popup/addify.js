@@ -14,18 +14,20 @@ function checkStoredSettings() {
       if (authCheck === 'yes' && authCode == undefined) {
         let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=code&state=123';
         window.open(spotURL);
-
         setTimeout(getAuthCode, 2000);
-      } else if (authCheck == undefined) {
+      } 
+      else if (authCheck == undefined) {
           authorize();
-      } else {
+      } 
+      else {
           refreshAccessToken();
       } 
   })
-}
+} // check if addify has been authorized
 
+// gets video title from Youtube api
 function getVidTitle(accessToken) {
-  console.log('getVidTitle');
+
   let tab = browser.tabs.query({currentWindow: true, active: true})  
   tab.then((tab) => {
     let url = 'https://www.youtube.com/oembed?url=' + tab[0].url + '&format=json';
@@ -43,9 +45,9 @@ function getVidTitle(accessToken) {
   }) 
 }
 
-// opens spotify authorize page
+// opens Spotify authorize page
 function authorize() {
-  console.log('authorize');
+
   document.getElementById("vid-name").innerHTML = 'Allow Addify to access some account info.';
   let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=code&state=123';
   window.open(spotURL);
@@ -54,10 +56,8 @@ function authorize() {
     })
 }
 
+// reads authorization code from URL address
 function getAuthCode() {
-  console.log('getAuthCode');
-
-  
 
   browser.tabs.query({currentWindow: true, active: true})
   .then(function(tabs) {
@@ -74,7 +74,7 @@ function getAuthCode() {
 
 // send authorization code to Spotify api to get refresh token
 function getRefreshToken() {
-  console.log('getRefreshToken');
+
   let getItem = browser.storage.local.get();
   getItem.then(res => {
     let authCode = res.authorization_code;
@@ -97,7 +97,7 @@ function getRefreshToken() {
 
 // send refresh token to Spotify api to get new access token
 function refreshAccessToken() {
-  console.log('refreshAccessToken');
+
   let getItem = browser.storage.local.get();
   getItem.then(res => {
     let refreshToken = res.refresh_token;
@@ -117,11 +117,10 @@ function refreshAccessToken() {
   })
 }
 
-// request info from Spotify API
+// request info from Spotify api
 function getSpotifyInfo(accessToken) {
-  document.getElementById('track').innerHTML = 'Song';
-  document.getElementById('artist').innerHTML = 'Artist';
-  //document.getElementById('add').innerHTML = 'Add Song';
+
+  
   fetch('https://api.spotify.com/v1/search?q='+vidTitle+'&type=track&limit=3', {
     method: 'GET',
     headers: {
@@ -130,36 +129,40 @@ function getSpotifyInfo(accessToken) {
   }).then(res => res.json())
   .then(res => {
     if (res.tracks.items[0] === undefined) {
-      alert('Song not found.');
+      document.getElementById('song-not-found').innerHTML = 'Song not found.';
     }
+    else {
+      document.getElementById('track').innerHTML = 'Song';
+      document.getElementById('artist').innerHTML = 'Artist';
 
-     document.getElementById('track1').innerHTML = res.tracks.items[0].name;
-     document.getElementById('track2').innerHTML = res.tracks.items[1].name;
-     document.getElementById('track3').innerHTML = res.tracks.items[2].name;
+      document.getElementById('track1').innerHTML = res.tracks.items[0].name;
+      document.getElementById('track2').innerHTML = res.tracks.items[1].name;
+      document.getElementById('track3').innerHTML = res.tracks.items[2].name;
 
-     document.getElementById('artist1').innerHTML = res.tracks.items[0].album.artists[0].name;
-     document.getElementById('artist2').innerHTML = res.tracks.items[1].album.artists[0].name;
-     document.getElementById('artist3').innerHTML = res.tracks.items[2].album.artists[0].name;
+      document.getElementById('artist1').innerHTML = res.tracks.items[0].album.artists[0].name;
+      document.getElementById('artist2').innerHTML = res.tracks.items[1].album.artists[0].name;
+      document.getElementById('artist3').innerHTML = res.tracks.items[2].album.artists[0].name;
 
-     let trackID1 = res.tracks.items[0].id;
-     let trackID2 = res.tracks.items[1].id;
-     let trackID3 = res.tracks.items[2].id;
+      let trackID1 = res.tracks.items[0].id;
+      let trackID2 = res.tracks.items[1].id;
+      let trackID3 = res.tracks.items[2].id;
 
-    let btn1 = document.createElement('button');
-    let btn2 = document.createElement('button');
-    let btn3 = document.createElement('button');
+      let btn1 = document.createElement('button');
+      let btn2 = document.createElement('button');
+      let btn3 = document.createElement('button');
 
-    btn1.innerHTML = '+';
-    btn2.innerHTML = '+';
-    btn3.innerHTML = '+';
+      btn1.innerHTML = '+';
+      btn2.innerHTML = '+';
+      btn3.innerHTML = '+';
 
-    document.getElementById('add1').appendChild(btn1);
-    document.getElementById('add2').appendChild(btn2);
-    document.getElementById('add3').appendChild(btn3);
+      document.getElementById('add1').appendChild(btn1);
+      document.getElementById('add2').appendChild(btn2);
+      document.getElementById('add3').appendChild(btn3);
 
-    document.getElementById('add1').addEventListener('click', addToLibrary.bind(null, accessToken, trackID1));
-    document.getElementById('add2').addEventListener('click', addToLibrary.bind(null, accessToken, trackID2));
-    document.getElementById('add3').addEventListener('click', addToLibrary.bind(null, accessToken, trackID3));
+      document.getElementById('add1').addEventListener('click', addToLibrary.bind(null, accessToken, trackID1));
+      document.getElementById('add2').addEventListener('click', addToLibrary.bind(null, accessToken, trackID2));
+      document.getElementById('add3').addEventListener('click', addToLibrary.bind(null, accessToken, trackID3));
+    }
   })
 }
 
