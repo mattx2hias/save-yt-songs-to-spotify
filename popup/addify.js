@@ -3,7 +3,7 @@ let scopes = 'user-library-modify';
 let redirectURI = 'https://www.spotify.com/us/';
 let vidTitle;
 
-// call this fcn on every extension button press
+// checks authorization code and if extension has been authorized to use Spotify
 function checkStoredSettings() {
   let getItem = browser.storage.local.get();
 
@@ -97,7 +97,6 @@ function getRefreshToken() {
 
 // send refresh token to Spotify api to get new access token
 function refreshAccessToken() {
-
   let getItem = browser.storage.local.get();
   getItem.then(res => {
     let refreshToken = res.refresh_token;
@@ -120,7 +119,6 @@ function refreshAccessToken() {
 // request info from Spotify api
 function getSpotifyInfo(accessToken) {
 
-  
   fetch('https://api.spotify.com/v1/search?q='+vidTitle+'&type=track&limit=3', {
     method: 'GET',
     headers: {
