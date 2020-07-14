@@ -54,6 +54,4 @@ button:hover {
 }
 #song-not-found {
     color: white;
-    grid-column-start: 2;
-    grid-column-end: 3;
 }

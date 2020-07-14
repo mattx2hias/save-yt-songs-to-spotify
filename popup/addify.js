@@ -1,7 +1,7 @@
 
 let scopes = 'user-library-modify';
 let redirectURI = 'https://www.spotify.com/us/';
-let vidTitle;
+let vidTitle, searchParam;
 
 // checks authorization code and if extension has been authorized to use Spotify
 function checkStoredSettings() {
@@ -35,12 +35,11 @@ function getVidTitle(accessToken) {
     fetch(url).then(response => response.json())
     .then(data => {
     vidTitle = data.title;
-    document.getElementById("vid-name").innerHTML = vidTitle;
-    // modify video title for better search results
-    vidTitle = vidTitle.replace(/Nightcore/g, '');
-    vidTitle = vidTitle.replace(/ *\([^)]*\) */g, ''); // remove text in parentheses
-    vidTitle = vidTitle.replace(/[^a-zA-Z0-9]/g,' '); // remove all special characters
-    getSpotifyInfo(accessToken, vidTitle);
+    
+    searchParam = vidTitle.replace(/[()]/g,''); // remove parentheses
+    searchParam = vidTitle.replace(/[^a-zA-Z0-9]/g,' '); // remove all special characters
+    document.getElementById("vid-name").innerHTML = searchParam;
+    getSpotifyInfo(accessToken, vidTitle, searchParam);
     })
   }) 
 }
@@ -119,49 +118,70 @@ function refreshAccessToken() {
 // request info from Spotify api
 function getSpotifyInfo(accessToken) {
 
-  fetch('https://api.spotify.com/v1/search?q='+vidTitle+'&type=track&limit=3', {
+  fetch('https://api.spotify.com/v1/search?q='+searchParam+'&type=track&limit=3', {
     method: 'GET',
     headers: {
       'Authorization': 'Bearer ' + accessToken
     }
   }).then(res => res.json())
   .then(res => {
+    console.log(searchParam);
     if (res.tracks.items[0] === undefined) {
-      document.getElementById('song-not-found').innerHTML = 'Song not found.';
+      document.getElementById('song-not-found').innerHTML = 'No song found';
+      let refineSearchBtn = document.createElement('button');
+      refineSearchBtn.innerHTML = 'Refine search';
+      document.getElementById('song-not-found').appendChild(refineSearchBtn);
+
+      document.getElementById('song-not-found').addEventListener('click', refineSearch.bind(null, accessToken));
     }
-    else {
+    if (res.tracks.items.length >= 1) {
+      document.getElementById('song-not-found').innerHTML = '';
       document.getElementById('track').innerHTML = 'Song';
       document.getElementById('artist').innerHTML = 'Artist';
 
       document.getElementById('track1').innerHTML = res.tracks.items[0].name;
-      document.getElementById('track2').innerHTML = res.tracks.items[1].name;
-      document.getElementById('track3').innerHTML = res.tracks.items[2].name;
-
       document.getElementById('artist1').innerHTML = res.tracks.items[0].album.artists[0].name;
-      document.getElementById('artist2').innerHTML = res.tracks.items[1].album.artists[0].name;
-      document.getElementById('artist3').innerHTML = res.tracks.items[2].album.artists[0].name;
-
       let trackID1 = res.tracks.items[0].id;
-      let trackID2 = res.tracks.items[1].id;
-      let trackID3 = res.tracks.items[2].id;
-
       let btn1 = document.createElement('button');
-      let btn2 = document.createElement('button');
-      let btn3 = document.createElement('button');
-
       btn1.innerHTML = '+';
-      btn2.innerHTML = '+';
-      btn3.innerHTML = '+';
 
       document.getElementById('add1').appendChild(btn1);
-      document.getElementById('add2').appendChild(btn2);
-      document.getElementById('add3').appendChild(btn3);
-
       document.getElementById('add1').addEventListener('click', addToLibrary.bind(null, accessToken, trackID1));
+    }
+    if (res.tracks.items.length >= 2) {
+      document.getElementById('track2').innerHTML = res.tracks.items[1].name;
+      document.getElementById('artist2').innerHTML = res.tracks.items[1].album.artists[0].name;
+      let trackID2 = res.tracks.items[1].id;
+      let btn2 = document.createElement('button');
+      btn2.innerHTML = '+';
+
+      document.getElementById('add2').appendChild(btn2);
       document.getElementById('add2').addEventListener('click', addToLibrary.bind(null, accessToken, trackID2));
+    }
+    if (res.tracks.items.length == 3) {
+      document.getElementById('track3').innerHTML = res.tracks.items[2].name;
+      document.getElementById('artist3').innerHTML = res.tracks.items[2].album.artists[0].name;
+      let trackID3 = res.tracks.items[2].id;
+      let btn3 = document.createElement('button');
+      btn3.innerHTML = '+';
+
+      document.getElementById('add3').appendChild(btn3);
       document.getElementById('add3').addEventListener('click', addToLibrary.bind(null, accessToken, trackID3));
     }
   })
+}
+
+// modify video title for better search results
+function refineSearch(accessToken) {
+  //console.log('refineSearch');
+  searchParam = vidTitle.replace(/ *\([^)]*\) */g, ''); // remove text in parentheses
+  //console.log(searchParam);
+  searchParam = searchParam.replace(/[^a-zA-Z0-9]/g,' '); // remove all special characters
+  searchParam = searchParam.replace(/Nightcore/gi, '');
+  searchParam = searchParam.replace(/Lyrics/gi, '');
+  //console.log(searchParam);
+  document.getElementById("vid-name").innerHTML = searchParam;
+  getSpotifyInfo(accessToken, searchParam);
 }
 
 // send access token and track ID to Spotify API to add song to users' library
