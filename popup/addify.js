@@ -37,8 +37,20 @@ function getVidTitle(accessToken) {
     vidTitle = data.title;
     
     searchParam = vidTitle.replace(/[()]/g,''); // remove parentheses
-    searchParam = vidTitle.replace(/[^a-zA-Z0-9]/g,' '); // remove all special characters
-    document.getElementById("vid-name").innerHTML = searchParam;
+    searchParam = searchParam.replace(/[[]]/g,''); // remove brackets
+    searchParam = searchParam.replace(/[^a-zA-Z0-9]/g,' '); // remove all special characters
+    searchParam = searchParam.replace(/lyrics/gi, '');
+    searchParam = searchParam.replace(/official/gi, '');
+    searchParam = searchParam.replace(/video/gi, '');
+    searchParam = searchParam.replace(/version/gi, '');
+    searchParam = searchParam.replace(/cover/gi, '');
+    searchParam = searchParam.replace(/nightcore/gi, '');
+    searchParam = searchParam.replace(/hd/gi, '');
+    searchParam = searchParam.replace(/hq/gi, '');
+    searchParam = searchParam.replace(/slowed/gi, '');
+    searchParam = searchParam.replace(/down/gi, '');
+    searchParam = searchParam.replace(/reverb/gi, '');
+
     getSpotifyInfo(accessToken, vidTitle, searchParam);
     })
   }) 
@@ -125,19 +137,23 @@ function getSpotifyInfo(accessToken) {
     }
   }).then(res => res.json())
   .then(res => {
-    console.log(searchParam);
     if (res.tracks.items[0] === undefined) {
+      console.log('no song found');
       document.getElementById('song-not-found').innerHTML = 'No song found';
       let refineSearchBtn = document.createElement('button');
       refineSearchBtn.innerHTML = 'Refine search';
-      document.getElementById('song-not-found').appendChild(refineSearchBtn);
+      document.getElementById('refine-search-btn').appendChild(refineSearchBtn);
 
-      document.getElementById('song-not-found').addEventListener('click', refineSearch.bind(null, accessToken));
+      document.getElementById('refine-search-btn').addEventListener('click', refineSearch.bind(null, accessToken));
+    } else {
+      document.getElementById("content").style.width = '500px';
     }
     if (res.tracks.items.length >= 1) {
       document.getElementById('song-not-found').innerHTML = '';
-      document.getElementById('track').innerHTML = 'Song';
-      document.getElementById('artist').innerHTML = 'Artist';
+      let t = document.getElementById('refine-search-btn');
+      t.parentNode.removeChild(t);
+      document.getElementById('track').innerHTML = 'TITLE';
+      document.getElementById('artist').innerHTML = 'ARTIST';
 
       document.getElementById('track1').innerHTML = res.tracks.items[0].name;
       document.getElementById('artist1').innerHTML = res.tracks.items[0].album.artists[0].name;
@@ -173,14 +189,22 @@ function getSpotifyInfo(accessToken) {
 
 // modify video title for better search results
 function refineSearch(accessToken) {
-  //console.log('refineSearch');
   searchParam = vidTitle.replace(/ *\([^)]*\) */g, ''); // remove text in parentheses
-  //console.log(searchParam);
+  searchParam = searchParam.replace(/ *\[[^\]]*]/g, ''); // remove text in brackets
   searchParam = searchParam.replace(/[^a-zA-Z0-9]/g,' '); // remove all special characters
-  searchParam = searchParam.replace(/Nightcore/gi, '');
-  searchParam = searchParam.replace(/Lyrics/gi, '');
-  //console.log(searchParam);
-  document.getElementById("vid-name").innerHTML = searchParam;
+  searchParam = searchParam.replace(/lyrics/gi, '');
+  searchParam = searchParam.replace(/official/gi, '');
+  searchParam = searchParam.replace(/video/gi, '');
+  searchParam = searchParam.replace(/version/gi, '');
+  searchParam = searchParam.replace(/cover/gi, '');
+  searchParam = searchParam.replace(/nightcore/gi, '');
+  searchParam = searchParam.replace(/hd/gi, '');
+  searchParam = searchParam.replace(/hq/gi, '');
+  searchParam = searchParam.replace(/slowed/gi, '');
+  searchParam = searchParam.replace(/down/gi, '');
+  searchParam = searchParam.replace(/reverb/gi, '');
+  
+  //document.getElementById("vid-name").innerHTML = searchParam;
   getSpotifyInfo(accessToken, searchParam);
 }
 
