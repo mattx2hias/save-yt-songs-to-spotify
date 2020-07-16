@@ -50,10 +50,9 @@ button {
 #song-not-found {
     color: white;
     font-size: 20px;
-    margin: auto;
+    text-align: center;
 }
-#refine-search-btn{
-    color: white;
-    float: bottom;
-    padding: 5px;
+#refine-search-btn {
+    text-align: center;
+    font-size: 20px;
 }

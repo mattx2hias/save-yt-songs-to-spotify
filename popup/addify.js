@@ -3,6 +3,8 @@ let scopes = 'user-library-modify';
 let redirectURI = 'https://www.spotify.com/us/';
 let vidTitle, searchParam;
 
+checkStoredSettings();
+
 // checks authorization code and if extension has been authorized to use Spotify
 function checkStoredSettings() {
   let getItem = browser.storage.local.get();
@@ -10,6 +12,7 @@ function checkStoredSettings() {
   getItem.then(res => {
       let authCode = res.authorization_code;
       let authCheck = res.authorization_check;
+      let refreshToken = res.refresh_token;
       console.log(authCheck);
       if (authCheck === 'yes' && authCode == undefined) {
         let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=code&state=123';
@@ -18,7 +21,9 @@ function checkStoredSettings() {
       } 
       else if (authCheck == undefined) {
           authorize();
-      } 
+      } else if (refreshToken == undefined) {
+        getRefreshToken();
+      }
       else {
           refreshAccessToken();
       } 
@@ -59,7 +64,7 @@ function getVidTitle(accessToken) {
 // opens Spotify authorize page
 function authorize() {
 
-  document.getElementById("vid-name").innerHTML = 'Allow Addify to access some account info.';
+  //document.getElementById("vid-name").innerHTML = 'Allow Addify to access some account info.';
   let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=code&state=123';
   window.open(spotURL);
   browser.storage.local.set({
@@ -85,7 +90,7 @@ function getAuthCode() {
 
 // send authorization code to Spotify api to get refresh token
 function getRefreshToken() {
-
+  console.log('getRefreshToken');
   let getItem = browser.storage.local.get();
   getItem.then(res => {
     let authCode = res.authorization_code;
@@ -137,14 +142,18 @@ function getSpotifyInfo(accessToken) {
     }
   }).then(res => res.json())
   .then(res => {
+    if (res.tracks == undefined) {
+      console.log(JSON.stringify(res));
+    }
     if (res.tracks.items[0] === undefined) {
       console.log('no song found');
       document.getElementById('song-not-found').innerHTML = 'No song found';
-      let refineSearchBtn = document.createElement('button');
-      refineSearchBtn.innerHTML = 'Refine search';
-      document.getElementById('refine-search-btn').appendChild(refineSearchBtn);
 
-      document.getElementById('refine-search-btn').addEventListener('click', refineSearch.bind(null, accessToken));
+        let refineSearchBtn = document.createElement('button');
+        refineSearchBtn.innerHTML = 'Refine search';
+        document.getElementById('refine-search-btn').appendChild(refineSearchBtn);
+  
+        document.getElementById('refine-search-btn').addEventListener('click', refineSearch.bind(null, accessToken, refineSearchBtn));
     } else {
       document.getElementById("content").style.width = '500px';
     }
@@ -152,7 +161,7 @@ function getSpotifyInfo(accessToken) {
       document.getElementById('song-not-found').innerHTML = '';
       let t = document.getElementById('refine-search-btn');
       t.parentNode.removeChild(t);
-      document.getElementById('track').innerHTML = 'TITLE';
+      document.getElementById('track').innerHTML = 'TRACK';
       document.getElementById('artist').innerHTML = 'ARTIST';
 
       document.getElementById('track1').innerHTML = res.tracks.items[0].name;
@@ -188,7 +197,7 @@ function getSpotifyInfo(accessToken) {
 }
 
 // modify video title for better search results
-function refineSearch(accessToken) {
+function refineSearch(accessToken, refineSearchBtn) {
   searchParam = vidTitle.replace(/ *\([^)]*\) */g, ''); // remove text in parentheses
   searchParam = searchParam.replace(/ *\[[^\]]*]/g, ''); // remove text in brackets
   searchParam = searchParam.replace(/[^a-zA-Z0-9]/g,' '); // remove all special characters
@@ -200,11 +209,11 @@ function refineSearch(accessToken) {
   searchParam = searchParam.replace(/nightcore/gi, '');
   searchParam = searchParam.replace(/hd/gi, '');
   searchParam = searchParam.replace(/hq/gi, '');
-  searchParam = searchParam.replace(/slowed/gi, '');
-  searchParam = searchParam.replace(/down/gi, '');
+  searchParam = searchParam.replace(/slowed down/gi, '');
   searchParam = searchParam.replace(/reverb/gi, '');
   
-  //document.getElementById("vid-name").innerHTML = searchParam;
+  document.getElementById('refine-search-btn').removeChild(refineSearchBtn);
+  document.getElementById('song-not-found').innerHTML = '';
   getSpotifyInfo(accessToken, searchParam);
 }
 
@@ -231,5 +240,3 @@ function addToLibrary(accessToken, trackID) {
   })
     .catch(error => alert('Could not add song'))
 }
-
-checkStoredSettings();
