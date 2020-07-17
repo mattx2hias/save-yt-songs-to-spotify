@@ -1,7 +1,5 @@
-
 let scopes = 'user-library-modify';
 let redirectURI = 'https://www.spotify.com/us/';
-let vidTitle, searchParam;
 
 checkStoredSettings();
 
@@ -10,25 +8,24 @@ function checkStoredSettings() {
   let getItem = browser.storage.local.get();
 
   getItem.then(res => {
-      let authCode = res.authorization_code;
-      let authCheck = res.authorization_check;
-      let refreshToken = res.refresh_token;
-      console.log(authCheck);
-      if (authCheck === 'yes' && authCode == undefined) {
-        let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=code&state=123';
-        window.open(spotURL);
-        setTimeout(getAuthCode, 2000);
-      } 
-      else if (authCheck == undefined) {
-          authorize();
-      } else if (refreshToken == undefined) {
-        getRefreshToken();
-      }
-      else {
-          refreshAccessToken();
-      } 
+    let authCode = res.authorization_code;
+    let refreshToken = res.refresh_token;
+    if (authCode == undefined || !authCode.startsWith('A')) {
+      let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=code&state=123';
+      window.open(spotURL);
+      setTimeout(getAuthCode, 2000);
+      // browser.tabs.onUpdated.addListener(() => {
+      //   setTimeout(getAuthCode, 500);
+      // });
+    }
+    else if (refreshToken == undefined) {
+      getRefreshToken();
+    }
+    else {
+      refreshAccessToken();
+    } 
   })
-} // check if addify has been authorized
+} // checkStoredSettings
 
 // gets video title from Youtube api
 function getVidTitle(accessToken) {
@@ -52,25 +49,18 @@ function getVidTitle(accessToken) {
     searchParam = searchParam.replace(/nightcore/gi, '');
     searchParam = searchParam.replace(/hd/gi, '');
     searchParam = searchParam.replace(/hq/gi, '');
-    searchParam = searchParam.replace(/slowed/gi, '');
-    searchParam = searchParam.replace(/down/gi, '');
-    searchParam = searchParam.replace(/reverb/gi, '');
 
     getSpotifyInfo(accessToken, vidTitle, searchParam);
     })
   }) 
-}
+} // getVidTitle
 
 // opens Spotify authorize page
 function authorize() {
 
-  //document.getElementById("vid-name").innerHTML = 'Allow Addify to access some account info.';
   let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=code&state=123';
   window.open(spotURL);
-  browser.storage.local.set({
-    authorization_check: 'yes'
-    })
-}
+} // authorize
 
 // reads authorization code from URL address
 function getAuthCode() {
@@ -79,21 +69,22 @@ function getAuthCode() {
   .then(function(tabs) {
     let url = tabs[0].url;
     let authCode = url.substr(33,198);
-  
-    browser.storage.local.set({
-    authorization_code: authCode
-    })
-    document.getElementById("vid-name").innerHTML = 'Authorization code received.';
+    //console.log(authCode);
+    browser.storage.local.set({authorization_code: authCode})
+
+    document.getElementById("content").style.width = '300px';
+    document.getElementById('song-not-found').innerHTML = 'Authorization code received';
     getRefreshToken();
   })
-}
+} // getAuthCode
 
 // send authorization code to Spotify api to get refresh token
 function getRefreshToken() {
-  console.log('getRefreshToken');
+  //console.log('getRefreshToken');
   let getItem = browser.storage.local.get();
   getItem.then(res => {
     let authCode = res.authorization_code;
+    //console.log(authCode);
     let payload = 'grant_type=authorization_code&code='+authCode+'&redirect_uri='+redirectURI;
     fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
@@ -104,15 +95,15 @@ function getRefreshToken() {
     body: payload
     }).then(res => res.json()).then(res => {
       let refreshToken = res.refresh_token;
-      browser.storage.local.set({
-        refresh_token: refreshToken
-      })
+      //console.log(JSON.stringify(res));
+      browser.storage.local.set({refresh_token: refreshToken})
     })
   })
-}
+} // getRefreshToken
 
 // send refresh token to Spotify api to get new access token
 function refreshAccessToken() {
+  //console.log('refreshAccessToken');
   let getItem = browser.storage.local.get();
   getItem.then(res => {
     let refreshToken = res.refresh_token;
@@ -125,12 +116,12 @@ function refreshAccessToken() {
     },
     body: payload
     }).then(res => res.json()).then(res => {
-       
+    //console.log(JSON.stringify(res));
     let accessToken = res.access_token; // new access token
     getVidTitle(accessToken);
     })
   })
-}
+} // refreshAccessToken
 
 // request info from Spotify api
 function getSpotifyInfo(accessToken) {
@@ -148,12 +139,10 @@ function getSpotifyInfo(accessToken) {
     if (res.tracks.items[0] === undefined) {
       console.log('no song found');
       document.getElementById('song-not-found').innerHTML = 'No song found';
-
-        let refineSearchBtn = document.createElement('button');
-        refineSearchBtn.innerHTML = 'Refine search';
-        document.getElementById('refine-search-btn').appendChild(refineSearchBtn);
-  
-        document.getElementById('refine-search-btn').addEventListener('click', refineSearch.bind(null, accessToken, refineSearchBtn));
+      let refineSearchBtn = document.createElement('button');
+      refineSearchBtn.innerHTML = 'Refine search';
+      document.getElementById('refine-search-btn').appendChild(refineSearchBtn);
+      document.getElementById('refine-search-btn').addEventListener('click', refineSearch.bind(null, accessToken, refineSearchBtn));
     } else {
       document.getElementById("content").style.width = '500px';
     }
@@ -169,7 +158,6 @@ function getSpotifyInfo(accessToken) {
       let trackID1 = res.tracks.items[0].id;
       let btn1 = document.createElement('button');
       btn1.innerHTML = '+';
-
       document.getElementById('add1').appendChild(btn1);
       document.getElementById('add1').addEventListener('click', addToLibrary.bind(null, accessToken, trackID1));
     }
@@ -179,7 +167,6 @@ function getSpotifyInfo(accessToken) {
       let trackID2 = res.tracks.items[1].id;
       let btn2 = document.createElement('button');
       btn2.innerHTML = '+';
-
       document.getElementById('add2').appendChild(btn2);
       document.getElementById('add2').addEventListener('click', addToLibrary.bind(null, accessToken, trackID2));
     }
@@ -189,12 +176,11 @@ function getSpotifyInfo(accessToken) {
       let trackID3 = res.tracks.items[2].id;
       let btn3 = document.createElement('button');
       btn3.innerHTML = '+';
-
       document.getElementById('add3').appendChild(btn3);
       document.getElementById('add3').addEventListener('click', addToLibrary.bind(null, accessToken, trackID3));
     }
   })
-}
+} // getSpotifyInfo
 
 // modify video title for better search results
 function refineSearch(accessToken, refineSearchBtn) {
@@ -209,8 +195,6 @@ function refineSearch(accessToken, refineSearchBtn) {
   searchParam = searchParam.replace(/nightcore/gi, '');
   searchParam = searchParam.replace(/hd/gi, '');
   searchParam = searchParam.replace(/hq/gi, '');
-  searchParam = searchParam.replace(/slowed down/gi, '');
-  searchParam = searchParam.replace(/reverb/gi, '');
   
   document.getElementById('refine-search-btn').removeChild(refineSearchBtn);
   document.getElementById('song-not-found').innerHTML = '';
@@ -239,4 +223,4 @@ function addToLibrary(accessToken, trackID) {
     }
   })
     .catch(error => alert('Could not add song'))
-}
+} // addToLibrary
