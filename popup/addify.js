@@ -11,11 +11,19 @@ async function checkStoredSettings() {
 
   if (authCode == undefined || !authCode.startsWith('A')) {
     let spotURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+scopes+'&response_type=code&state=123';
-    window.open(spotURL);
-    setTimeout(getAuthCode, 2000);
-    // browser.tabs.onUpdated.addListener(() => {
-    //   setTimeout(getAuthCode, 500);
-    // });
+   window.open(spotURL);
+    let tab = await browser.tabs.query({currentWindow: true, active: true});
+    let url = tab[0].url;
+
+    while(!url.startsWith("https://www.spotify.com/us/?code")) {
+      setTimeout(() => {}, 500);
+      tab = await browser.tabs.query({currentWindow: true, active: true});
+      url = tab[0].url;
+      if(url.startsWith("https://www.spotify.com/us/?code")) {
+        getAuthCode();
+      }
+    }
+    
   }
   else if (refreshToken == undefined) {
     getRefreshToken();
@@ -56,6 +64,7 @@ function authorize() {
 
 // reads authorization code from URL address
 async function getAuthCode() {
+  console.log("getAuthCode");
   let tab = await browser.tabs.query({currentWindow: true, active: true})
   let url = tab[0].url;
   let authCode = url.substr(33,198);
@@ -71,7 +80,7 @@ async function getRefreshToken() {
   let getItem = await browser.storage.local.get();
   let authCode = getItem.authorization_code;
   let payload = 'grant_type=authorization_code&code='+authCode+'&redirect_uri='+redirectURI;
-  
+  console.log(authCode);
   let promise = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {

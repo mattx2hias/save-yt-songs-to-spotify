@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Addify",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "A Firefox extension that reads the title of an opened Youtube video, searches Spotify, and displays results in the popup. You can then add the songs to your Spotify library. ",
     "icons": {
         "48": "icons/toolbar-icon-48.png"
