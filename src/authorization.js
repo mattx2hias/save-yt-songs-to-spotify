@@ -1,55 +1,91 @@
-
 /**
  * Authorization Code Flow with Proof Key for Code Exchange (PKCE)
  * https://developer.spotify.com/documentation/general/guides/authorization-guide/#authorization-code-flow-with-proof-key-for-code-exchange-pkce
  */
 
-const sha256 = require('sha256')
-const randomState = window.crypto.getRandomValues(new Uint32Array(1)).toString()
 const clientID = '97c3e5d4f7e142f7b11c0daf2b19793d'
-
-// /**
-//  * Generate string for authorization URI
-//  * @returns cryptographically random string that has been SHA256 hashed and base-64 encoded
-//  */
- function generateCodeChallenge() {
-     const array = window.crypto.getRandomValues(new Int32Array()).toString
-     let codeVerifier = ''
-     let i = 0
- 
-     while(codeVerifier.length <= 50) {
-         codeVerifier += array[i] 
-         i++
-     }
- 
-     return window.btoa(sha256(codeVerifier))
- }
+const redirectURI = 'https://www.spotify.com'
  
  /**
   * Retrieve browser's local storage and checks if it has the authorization code
   */
 async function getStoredSettings() {
-  let storageContainer = await browser.storage.local.get()
-  let authorizationCode = storageContainer.authorization_code
+  const browStore = await browser.storage.local.get()
 
-  if (authorizationCode == undefined) {
-    checkAuthorizationCode()
-  } else console.log('has authorization code')
+  if (browStore.authorization_code == undefined) {
+    openAuthorizationPrompt()
+  } else if (browStore.refresh_token == undefined) {
+    getRefreshToken()
+  } else {
+    refreshAccessToken()
+  }
 }
 
 /**
  * Stores state to be checked later and opens the authorization URI
  */
-async function checkAuthorizationCode() {
+async function openAuthorizationPrompt() {
   const scopes = 'user-library-modify'
-  const redirectURI = 'https://www.spotify.com'
-  const codeChallenge = generateCodeChallenge()
-  
+  const codeVerifier = generateRandomString()
+  const codeChallenge = await challenge_from_verifier(codeVerifier)
+  const randomState = generateRandomString()
+
+  browser.storage.local.set({code_verifier: codeVerifier})
   browser.storage.local.set({state: randomState})
-  
-  const authorizationURL = 'https://accounts.spotify.com/authorize?client_id='+clientID+'&redirect_uri='+redirectURI+'&scope='+
-  scopes+'&state='+randomState+'&code_challenge='+codeChallenge+'&code_challenge_method=S256&response_type=code'
+  // wait for script to save the above to local storage
+  const s = await browser.storage.local.get()
+
+  const authorizationURL =  'https://accounts.spotify.com/authorize?client_id='+clientID+
+                            '&redirect_uri='+redirectURI+
+                            '&scope='+scopes+
+                            '&state='+randomState+
+                            '&code_challenge='+codeChallenge+
+                            '&code_challenge_method=S256'
+                            '&response_type=code'
   window.open(authorizationURL)
+}
+
+/**
+ * POST authorization code to Spotify, get back access token, refresh token
+ */
+async function getRefreshToken() {
+  const browStore = await browser.storage.local.get()
+
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'client_id='+clientID+
+          '&grant_type=authorization_code'+
+          '&code='+browStore.authorization_code+
+          '&redirect_uri='+redirectURI+
+          '&code_verifier='+browStore.code_verifier
+  })
+  const data = await res.json()
+  const accessToken = data.access_token
+  const refreshToken = data.refresh_token
+  browser.storage.local.set({refresh_token: refreshToken})
+  console.log('refresh token: ' + refreshToken)
+  //getVidTitle(accessToken)
+}
+
+/**
+ * POST refresh token to Spotify to receive new access token
+ */
+async function refreshAccessToken() {
+  const browStore = await browser.storage.local.get()
+
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'grant_type=refresh_token'+
+          '&refresh_token='+browStore.refresh_token+
+          '&client_id='+clientID
+  })
+  const data = await res.json()
+  console.log(data)
+  const accessToken = res.access_token
+  console.log('access token: ' + accessToken)
+  //getVidTitle(accessToken)
 }
 
 getStoredSettings()

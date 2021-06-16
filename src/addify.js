@@ -1,5 +1,4 @@
 
-
 // gets video title from Youtube api
 async function getVidTitle(accessToken) {
   let tab = await browser.tabs.query({currentWindow: true, active: true})  
@@ -22,43 +21,6 @@ async function getVidTitle(accessToken) {
 
   getSpotifyInfo(accessToken, vidTitle, searchParam);
 } // getVidTitle
-
-// send authorization code to Spotify api to get refresh token
-async function getRefreshToken() {
-  let getItem = await browser.storage.local.get()
-  let authCode = getItem.authorization_code
-  let payload = 'grant_type=authorization_code&code='+authCode+'&redirect_uri='+redirectURI
-  console.log(authCode)
-  let promise = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Basic ' + encodedIDSecret,
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: payload
-  });
-  let data = await promise.json()
-  let refreshToken = data.refresh_token;
-  browser.storage.local.set({refresh_token: refreshToken})
-} // getRefreshToken
-
-// send refresh token to Spotify api to get new access token
-async function refreshAccessToken() {
-  let getItem = await browser.storage.local.get()
-  let refreshToken = getItem.refresh_token
-  let payload = 'grant_type=refresh_token&refresh_token='+refreshToken
-  let promise = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Basic ' + encodedIDSecret,
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: payload
-  });
-  let data = await promise.json()
-  let accessToken = data.access_token; // new access token
-  getVidTitle(accessToken);
-} // refreshAccessToken
 
 // request info from Spotify api
 async function getSpotifyInfo(accessToken) {
