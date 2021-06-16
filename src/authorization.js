@@ -12,9 +12,9 @@ const redirectURI = 'https://www.spotify.com'
 async function getStoredSettings() {
   const browStore = await browser.storage.local.get()
 
-  if (browStore.authorization_code == undefined) {
+  if (browStore.authorization_code === undefined) {
     openAuthorizationPrompt()
-  } else if (browStore.refresh_token == undefined) {
+  } else if (browStore.refresh_token === undefined) {
     getRefreshToken()
   } else {
     refreshAccessToken()
@@ -22,7 +22,7 @@ async function getStoredSettings() {
 }
 
 /**
- * Stores state to be checked later and opens the authorization URI
+ * Generate state, code verifier and challenge. Open authorization prompt
  */
 async function openAuthorizationPrompt() {
   const scopes = 'user-library-modify'
@@ -40,16 +40,18 @@ async function openAuthorizationPrompt() {
                             '&scope='+scopes+
                             '&state='+randomState+
                             '&code_challenge='+codeChallenge+
-                            '&code_challenge_method=S256'
+                            '&code_challenge_method=S256'+
                             '&response_type=code'
   window.open(authorizationURL)
 }
 
 /**
- * POST authorization code to Spotify, get back access token, refresh token
+ * POST authorization code to Spotify api, receive access token and refresh token
  */
 async function getRefreshToken() {
+  console.log('getRefreshToken')
   const browStore = await browser.storage.local.get()
+  console.log(browStore.authorization_code)
 
   const res = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
@@ -63,15 +65,16 @@ async function getRefreshToken() {
   const data = await res.json()
   const accessToken = data.access_token
   const refreshToken = data.refresh_token
+
   browser.storage.local.set({refresh_token: refreshToken})
-  console.log('refresh token: ' + refreshToken)
   //getVidTitle(accessToken)
 }
 
 /**
- * POST refresh token to Spotify to receive new access token
+ * POST refresh token to Spotify api, receive new access and refresh token
  */
 async function refreshAccessToken() {
+  console.log('refreshAccessToken')
   const browStore = await browser.storage.local.get()
 
   const res = await fetch('https://accounts.spotify.com/api/token', {
@@ -82,9 +85,10 @@ async function refreshAccessToken() {
           '&client_id='+clientID
   })
   const data = await res.json()
-  console.log(data)
-  const accessToken = res.access_token
-  console.log('access token: ' + accessToken)
+  const accessToken = data.access_token
+  const refreshToken = data.refresh_token
+
+  browser.storage.local.set({refresh_token: refreshToken})
   //getVidTitle(accessToken)
 }
 
