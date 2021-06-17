@@ -49,9 +49,7 @@ async function openAuthorizationPrompt() {
  * POST authorization code to Spotify api, receive access token and refresh token
  */
 async function getRefreshToken() {
-  console.log('getRefreshToken')
   const browStore = await browser.storage.local.get()
-  console.log(browStore.authorization_code)
 
   const res = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
@@ -67,14 +65,13 @@ async function getRefreshToken() {
   const refreshToken = data.refresh_token
 
   browser.storage.local.set({refresh_token: refreshToken})
-  //getVidTitle(accessToken)
+  getVidTitle(accessToken)
 }
 
 /**
  * POST refresh token to Spotify api, receive new access and refresh token
  */
 async function refreshAccessToken() {
-  console.log('refreshAccessToken')
   const browStore = await browser.storage.local.get()
 
   const res = await fetch('https://accounts.spotify.com/api/token', {
@@ -89,7 +86,7 @@ async function refreshAccessToken() {
   const refreshToken = data.refresh_token
 
   browser.storage.local.set({refresh_token: refreshToken})
-  //getVidTitle(accessToken)
+  getVidTitle(accessToken)
 }
 
 getStoredSettings()

@@ -1,28 +1,38 @@
 
-// gets video title from Youtube api
+/**
+ * Check URL, get title of Youtube video, apply regex to video title.
+ * @param {*} accessToken 
+ */
 async function getVidTitle(accessToken) {
   let tab = await browser.tabs.query({currentWindow: true, active: true})  
+
+  if(!(tab[0].url).includes('www.youtube.com/watch')) {
+    document.getElementById('song-not-found').innerHTML = 'Open a Youtube video to search'
+    return null
+  }
+
   let url = 'https://www.youtube.com/oembed?url=' + tab[0].url + '&format=json'
   let promise = await fetch(url)
   let data = await promise.json()
   vidTitle = data.title;
 
-  searchParam = vidTitle.replace(/[()]/g,''); // remove parentheses
-  searchParam = searchParam.replace(/[[]]/g,''); // remove brackets
-  searchParam = searchParam.replace(/[^a-zA-Z0-9]/g,' '); // remove all special characters
-  searchParam = searchParam.replace(/lyrics/gi, '');
-  searchParam = searchParam.replace(/official/gi, '');
-  searchParam = searchParam.replace(/video/gi, '');
-  searchParam = searchParam.replace(/version/gi, '');
-  searchParam = searchParam.replace(/cover/gi, '');
-  searchParam = searchParam.replace(/nightcore/gi, '');
-  searchParam = searchParam.replace(/hd/gi, '');
-  searchParam = searchParam.replace(/hq/gi, '');
+  searchParam = vidTitle.replace(/[^a-zA-Z0-9\'\()]/g,' ')
+                        .replace(/(\(|\[)?(official\s)?music\svideo(\)|\])?/i, '')
+                        .replace(/(\(|\[)?(official\s)?lyric(s)?\svideo(\)|\])?/i, '')
+                        .replace(/(\(|\[)?official\s((lyric(s)?)|video)(\)|\])?/i, '')
+                        .replace(/(\(|\[)lyrics(\)|\])/i, '')
+                        .replace(/(\(|\[)?(slow(ed)?(\sdown)?)(\s*(and|n|\+)?\s*(reverb))?(\)|\])?/i, '')
+                        .replace(/high\squality/i, '')
+                        .replace(/hd|hq/i, '')
 
+  console.log(searchParam)
   getSpotifyInfo(accessToken, vidTitle, searchParam);
-} // getVidTitle
+}
 
-// request info from Spotify api
+/**
+ * GET song info from Spotify API, display in extension popup.
+ * @param {*} accessToken 
+ */
 async function getSpotifyInfo(accessToken) {
   let promise = await fetch('https://api.spotify.com/v1/search?q='+searchParam+'&type=track&limit=3', {
     method: 'GET',
@@ -35,6 +45,7 @@ async function getSpotifyInfo(accessToken) {
     console.log(JSON.stringify(data))
   }
   if (data.tracks.items[0] === undefined) {
+    //remove text in parentheses or brackets automatically and search again
     console.log('no song found')
     document.getElementById('song-not-found').innerHTML = 'No song found'
     let refineSearchBtn = document.createElement('button')
@@ -77,28 +88,31 @@ async function getSpotifyInfo(accessToken) {
     document.getElementById('add3').appendChild(btn3)
     document.getElementById('add3').addEventListener('click', addToLibrary.bind(null, accessToken, trackID3))
   }
-} // getSpotifyInfo
+}
 
-// modify video title for better search results
+/**
+ * Modify video title for less accurate, but greater likelihood of returning songs.
+ * @param {*} accessToken 
+ * @param {*} refineSearchBtn 
+ */
 function refineSearch(accessToken, refineSearchBtn) {
-  searchParam = vidTitle.replace(/ *\([^)]*\) */g, ''); // remove text in parentheses
-  searchParam = searchParam.replace(/ *\[[^\]]*]/g, ''); // remove text in brackets
-  searchParam = searchParam.replace(/[^a-zA-Z0-9]/g,' '); // remove all special characters
-  searchParam = searchParam.replace(/lyrics/gi, '');
-  searchParam = searchParam.replace(/official/gi, '');
-  searchParam = searchParam.replace(/video/gi, '');
-  searchParam = searchParam.replace(/version/gi, '');
-  searchParam = searchParam.replace(/cover/gi, '');
-  searchParam = searchParam.replace(/nightcore/gi, '');
-  searchParam = searchParam.replace(/hd/gi, '');
-  searchParam = searchParam.replace(/hq/gi, '');
-  
+  searchParam = vidTitle.replace(/ *\([^)]*\) */g, '')
+                        .replace(/ *\[[^\]]*]/g, '')
+                        .replace(/[^a-zA-Z0-9]/g,' ')
+                        .replace(/lyrics/i, '')
+                        .replace(/nightcore/i, '')
+
+  console.log(searchParam)
   document.getElementById('refine-search-btn').removeChild(refineSearchBtn)
   document.getElementById('song-not-found').innerHTML = ''
   getSpotifyInfo(accessToken, searchParam)
 }
 
-// send access token and track ID to Spotify API to add song to users' library
+/**
+ * PUT accessToken, trackID to Spotify API, which then adds the song to users' library.
+ * @param {*} accessToken 
+ * @param {*} trackID 
+ */
 async function addToLibrary(accessToken, trackID) {
   let ID = [String(trackID)]
   let payload = {
@@ -114,8 +128,10 @@ async function addToLibrary(accessToken, trackID) {
   });
   switch(promise.status) {
     case 200:
-      alert('Song added to your library.'); break;
+      alert('Song added to your library.')
+      break
     default:
-      alert('Could not add song.'); break;
+      alert('Could not add song.')
+      break
   }
-} // addToLibrary
+}
