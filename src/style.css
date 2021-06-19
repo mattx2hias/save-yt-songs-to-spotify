@@ -17,8 +17,17 @@ body { background-color: var(--clr-black); }
 div { color: white; }
 div > button { margin: 10px; }
 div > h3 { margin: 10px; }
+div > img { 
+    width: 70px; 
+    height: 21px;
+    margin-top: 5px;
+}
 ul { list-style-type: none; }
 li { font-size: 20px; }
+#spotLogo { 
+    display: none; 
+    text-align: center;
+}
 #buttonList li {
     color: var(--clr-green);
 }

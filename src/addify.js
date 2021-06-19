@@ -83,6 +83,7 @@ async function getSpotifyInfo(accessToken) {
     document.getElementById('trackHead').innerHTML = 'TRACK'
     document.getElementById('artistHead').innerHTML = 'ARTIST'
     document.getElementById('buttonHead').innerHTML = '( ͡° ͜ʖ ͡°)'
+    document.getElementById('spotLogo').style.display = 'block'
   }
 
   let numOfResults = 3
