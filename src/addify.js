@@ -128,12 +128,19 @@ async function addToLibrary(accessToken, trackID) {
     },
     body: JSON.stringify(payload)
   });
+  let text
   switch(promise.status) {
     case 200:
-      alert('Song added to your library.')
+      text = document.createElement('h3')
+      text.innerHTML = 'Song added to library'
+      document.getElementById('wrapper').style.display = 'none'
+      document.getElementById('songNotFound').appendChild(text)
       break
     default:
-      alert('Could not add song.')
+      text = document.createElement('h3')
+      text.innerHTML = 'Failed to add song to library'
+      document.getElementById('wrapper').style.display = 'none'
+      document.getElementById('songNotFound').appendChild(text)
       break
   }
 }
