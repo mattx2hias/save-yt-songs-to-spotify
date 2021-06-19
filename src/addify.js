@@ -18,14 +18,14 @@ async function getVidTitle(accessToken) {
   let data = await promise.json()
   vidTitle = data.title;
 
-  searchParam = vidTitle.replace(/[^a-zA-Z0-9\'\()]/g,' ')
+  searchParam = vidTitle.replace(/[^a-zA-Z0-9\'\(\)\[\]\-\s]/g,'')
                         .replace(/(\(|\[)?(official\s)?music\svideo(\)|\])?/i, '')
                         .replace(/(\(|\[)?(official\s)?lyric(s)?\svideo(\)|\])?/i, '')
-                        .replace(/(\(|\[)?official\s((lyric(s)?)|video)(\)|\])?/i, '')
-                        .replace(/(\(|\[)lyrics(\)|\])/i, '')
+                        .replace(/(\(|\[)?official\s((lyric(s)?)|video|audio)(\)|\])?/i, '')
+                        .replace(/(\(|\[)lyric(s)?(\)|\])/i, '')
                         .replace(/(\(|\[)?(slow(ed)?(\sdown)?)(\s*(and|n|\+)?\s*(reverb))?(\)|\])?/i, '')
-                        .replace(/high\squality/i, '')
-                        .replace(/hd|hq/i, '')
+                        .replace(/(\(|\[)high\squality(\)|\])/i, '')
+                        .replace(/(\(|\[)(hd|hq)(\)|\])/i, '')
 
   console.log(searchParam)
   getSpotifyInfo(accessToken, vidTitle, searchParam);
@@ -69,7 +69,7 @@ async function getSpotifyInfo(accessToken) {
     console.log(JSON.stringify(data))
   }
   if (data.tracks.items[0] === undefined) {
-    //remove text in parentheses or brackets automatically and search again
+    // TODO: parse and apply regex to the title and search again automatically
     const text = document.createElement('h3')
     text.innerHTML = 'No song found'
     document.getElementById('songNotFound').appendChild(text)

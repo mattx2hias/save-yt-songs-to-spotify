@@ -1,9 +1,10 @@
 {
     "manifest_version": 2,
     "name": "Addify",
-    "version": "1.3.1",
+    "version": "1.4.1",
     "description": "Searches Spotify with Youtube video title and displays results in the popup where they can be added to your Spotify library.",
     "icons": {
+        "96": "assets/icons/toolbar-icon-96.png",
         "48": "assets/icons/toolbar-icon-48.png"
     },
     "content_scripts": [
@@ -20,7 +21,10 @@
         "storage"
     ],
     "browser_action":{
-        "default_icon": "assets/icons/toolbar-icon-32.png",
+        "default_icon": {
+            "48": "assets/icons/toolbar-icon-48.png",
+            "32": "assets/icons/toolbar-icon-32.png"
+        },
         "default_title": "Addify",
         "default_popup": "src/index.html"
     }
