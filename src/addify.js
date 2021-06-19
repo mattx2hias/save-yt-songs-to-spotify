@@ -8,7 +8,7 @@ async function getVidTitle(accessToken) {
 
   if(!(tab[0].url).includes('www.youtube.com/watch')) {
     const text = document.createElement('h3')
-    text.innerHTML = 'Open a Youtube video to search'
+    text.textContent = 'Open a Youtube video to search'
     document.getElementById('songNotFound').appendChild(text)
     return null
   }
@@ -27,7 +27,7 @@ async function getVidTitle(accessToken) {
                         .replace(/(\(|\[)high\squality(\)|\])/i, '')
                         .replace(/(\(|\[)(hd|hq)(\)|\])/i, '')
 
-  console.log(searchParam)
+  //console.log(searchParam)
   getSpotifyInfo(accessToken, vidTitle, searchParam);
 }
 
@@ -42,9 +42,9 @@ function displaySong(data, index, accessToken) {
   const artist = document.createElement('li')
   const button = document.createElement('li')
 
-  track.innerHTML = data.tracks.items[0].name
-  artist.innerHTML = data.tracks.items[0].album.artists[0].name
-  button.innerHTML = '+'
+  track.textContent = data.tracks.items[0].name
+  artist.textContent = data.tracks.items[0].album.artists[0].name
+  button.textContent = '+'
 
   button.addEventListener('click', addToLibrary.bind(null, accessToken, data.tracks.items[index].id))
 
@@ -71,18 +71,18 @@ async function getSpotifyInfo(accessToken) {
   if (data.tracks.items[0] === undefined) {
     // TODO: parse and apply regex to the title and search again automatically
     const text = document.createElement('h3')
-    text.innerHTML = 'No song found'
+    text.textContent = 'No song found'
     document.getElementById('songNotFound').appendChild(text)
 
     let refineSearchBtn = document.createElement('button')
-    refineSearchBtn.innerHTML = 'Refine search'
+    refineSearchBtn.textContent = 'Refine search'
     document.getElementById('songNotFound').appendChild(refineSearchBtn)
     document.getElementById('songNotFound').addEventListener('click', refineSearch.bind(null, accessToken, refineSearchBtn))
     return null
   } else {
-    document.getElementById('trackHead').innerHTML = 'TRACK'
-    document.getElementById('artistHead').innerHTML = 'ARTIST'
-    document.getElementById('buttonHead').innerHTML = '( ͡° ͜ʖ ͡°)'
+    document.getElementById('trackHead').textContent = 'TRACK'
+    document.getElementById('artistHead').textContent = 'ARTIST'
+    document.getElementById('buttonHead').textContent = '( ͡° ͜ʖ ͡°)'
     document.getElementById('spotLogo').style.display = 'block'
   }
 
@@ -105,9 +105,9 @@ function refineSearch(accessToken, refineSearchBtn) {
                         .replace(/lyrics/i, '')
                         .replace(/nightcore/i, '')
 
-  console.log(searchParam)
+  //console.log(searchParam)
   document.getElementById('songNotFound').removeChild(refineSearchBtn)
-  document.getElementById('songNotFound').innerHTML = ''
+  document.getElementById('songNotFound').textContent = ''
   getSpotifyInfo(accessToken, searchParam)
 }
 
@@ -133,13 +133,13 @@ async function addToLibrary(accessToken, trackID) {
   switch(promise.status) {
     case 200:
       text = document.createElement('h3')
-      text.innerHTML = 'Song added to library'
+      text.textContent = 'Song added to library'
       document.getElementById('wrapper').style.display = 'none'
       document.getElementById('songNotFound').appendChild(text)
       break
     default:
       text = document.createElement('h3')
-      text.innerHTML = 'Failed to add song to library'
+      text.textContent = 'Failed to add song to library'
       document.getElementById('wrapper').style.display = 'none'
       document.getElementById('songNotFound').appendChild(text)
       break
