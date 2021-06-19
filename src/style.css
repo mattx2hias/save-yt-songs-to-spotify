@@ -1,58 +1,46 @@
-html, body {
-    background-color: rgb(25, 20, 20);
+:root {
+    --clr-black: rgb(25, 20, 20);
+    --clr-green: rgb(30, 215, 96);
+    --clr-red: rgb(179, 23, 18);
 }
-#error-content {
-    display: none;
+* {
+    margin: 0;
+    padding: 0;
 }
-#content {
-    width: 150px;
+#wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
-#track1, #track2, #track3, #track4, #track5 {
-    color: white;
-    font-size: 20px;
+body { background-color: var(--clr-black); }
+div { color: white; }
+div > button { margin: 10px; }
+div > h3 { margin: 10px; }
+ul { list-style-type: none; }
+li { font-size: 20px; }
+#buttonList li {
+    color: var(--clr-green);
 }
-#artist1, #artist2, #artist3, #artist4, #artist5 {
-    color: white;
-    font-size: 20px;
+#buttonList li:hover {
+    color: var(--clr-red);
+    cursor: default;
 }
-#track, #artist, #add{
+#trackHead, #artistHead {
     color: grey;
     font-size: 10px;
 }
-#track {
-    grid-column-start: 1;
-    grid-column-end: 2;
+#buttonList #buttonHead {
+    color: var(--clr-black);
+    font-size: 10px;
 }
-#artist {
-    grid-column-start: 2;
-    grid-column-end: 3;
+#trackList, #artistList li {
+    margin-left: 15px;
+    margin-right: 15px;
 }
-#add {
-    grid-column-start: 3;
-    grid-column-end: 4;
-
-}
-.grid-container {
-    display: grid;
-    column-gap: 10px;
-    row-gap: 5px;
-    grid-template-columns: 225px 225px 30px;
-}
-#add1, #add2, #add3 {
-    size: 25px;
-}
-button {
-    font-size: 20px;
-    color: rgb(30, 215, 96);
-    background-color: rgb(25, 20, 20);
-    border-color: rgb(25, 20, 20);
-} 
-#song-not-found {
-    color: white;
-    font-size: 20px;
-    text-align: center;
-}
-#refine-search-btn {
-    text-align: center;
-    font-size: 20px;
+#songNotFound {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }

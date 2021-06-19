@@ -7,7 +7,9 @@ async function getVidTitle(accessToken) {
   let tab = await browser.tabs.query({currentWindow: true, active: true})  
 
   if(!(tab[0].url).includes('www.youtube.com/watch')) {
-    document.getElementById('song-not-found').innerHTML = 'Open a Youtube video to search'
+    const text = document.createElement('h3')
+    text.innerHTML = 'Open a Youtube video to search'
+    document.getElementById('songNotFound').appendChild(text)
     return null
   }
 
@@ -30,6 +32,28 @@ async function getVidTitle(accessToken) {
 }
 
 /**
+ * Create new row with track name, artist and button to add song.
+ * @param {*} data 
+ * @param {*} index 
+ * @param {*} accessToken 
+ */
+function displaySong(data, index, accessToken) {
+  const track = document.createElement('li')
+  const artist = document.createElement('li')
+  const button = document.createElement('li')
+
+  track.innerHTML = data.tracks.items[0].name
+  artist.innerHTML = data.tracks.items[0].album.artists[0].name
+  button.innerHTML = '+'
+
+  button.addEventListener('click', addToLibrary.bind(null, accessToken, data.tracks.items[index].id))
+
+  document.getElementById('trackList').appendChild(track)
+  document.getElementById('artistList').appendChild(artist)  
+  document.getElementById('buttonList').appendChild(button)  
+}
+
+/**
  * GET song info from Spotify API, display in extension popup.
  * @param {*} accessToken 
  */
@@ -46,47 +70,25 @@ async function getSpotifyInfo(accessToken) {
   }
   if (data.tracks.items[0] === undefined) {
     //remove text in parentheses or brackets automatically and search again
-    console.log('no song found')
-    document.getElementById('song-not-found').innerHTML = 'No song found'
+    const text = document.createElement('h3')
+    text.innerHTML = 'No song found'
+    document.getElementById('songNotFound').appendChild(text)
+
     let refineSearchBtn = document.createElement('button')
     refineSearchBtn.innerHTML = 'Refine search'
-    document.getElementById('refine-search-btn').appendChild(refineSearchBtn)
-    document.getElementById('refine-search-btn').addEventListener('click', refineSearch.bind(null, accessToken, refineSearchBtn))
+    document.getElementById('songNotFound').appendChild(refineSearchBtn)
+    document.getElementById('songNotFound').addEventListener('click', refineSearch.bind(null, accessToken, refineSearchBtn))
+    return null
   } else {
-    document.getElementById('content').style.width = '500px'
+    document.getElementById('trackHead').innerHTML = 'TRACK'
+    document.getElementById('artistHead').innerHTML = 'ARTIST'
+    document.getElementById('buttonHead').innerHTML = '( ͡° ͜ʖ ͡°)'
   }
-  if (data.tracks.items.length >= 1) {
-    document.getElementById('song-not-found').innerHTML = ''
-    let t = document.getElementById('refine-search-btn')
-    t.parentNode.removeChild(t)
-    document.getElementById('track').innerHTML = 'TRACK'
-    document.getElementById('artist').innerHTML = 'ARTIST'
 
-    document.getElementById('track1').innerHTML = data.tracks.items[0].name
-    document.getElementById('artist1').innerHTML = data.tracks.items[0].album.artists[0].name
-    let trackID1 = data.tracks.items[0].id
-    let btn1 = document.createElement('button')
-    btn1.innerHTML = '+';
-    document.getElementById('add1').appendChild(btn1)
-    document.getElementById('add1').addEventListener('click', addToLibrary.bind(null, accessToken, trackID1))
-  }
-  if (data.tracks.items.length >= 2) {
-    document.getElementById('track2').innerHTML = data.tracks.items[1].name
-    document.getElementById('artist2').innerHTML = data.tracks.items[1].album.artists[0].name
-    let trackID2 = data.tracks.items[1].id
-    let btn2 = document.createElement('button')
-    btn2.innerHTML = '+'
-    document.getElementById('add2').appendChild(btn2)
-    document.getElementById('add2').addEventListener('click', addToLibrary.bind(null, accessToken, trackID2))
-  }
-  if (data.tracks.items.length == 3) {
-    document.getElementById('track3').innerHTML = data.tracks.items[2].name
-    document.getElementById('artist3').innerHTML = data.tracks.items[2].album.artists[0].name
-    let trackID3 = data.tracks.items[2].id
-    let btn3 = document.createElement('button')
-    btn3.innerHTML = '+';
-    document.getElementById('add3').appendChild(btn3)
-    document.getElementById('add3').addEventListener('click', addToLibrary.bind(null, accessToken, trackID3))
+  let numOfResults = 3
+  if(data.tracks.items.length < numOfResults) numOfResults = data.tracks.items.length
+  for(let i = 0; i < numOfResults; i++) {
+    displaySong(data, i, accessToken)
   }
 }
 
@@ -103,8 +105,8 @@ function refineSearch(accessToken, refineSearchBtn) {
                         .replace(/nightcore/i, '')
 
   console.log(searchParam)
-  document.getElementById('refine-search-btn').removeChild(refineSearchBtn)
-  document.getElementById('song-not-found').innerHTML = ''
+  document.getElementById('songNotFound').removeChild(refineSearchBtn)
+  document.getElementById('songNotFound').innerHTML = ''
   getSpotifyInfo(accessToken, searchParam)
 }
 
