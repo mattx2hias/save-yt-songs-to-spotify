@@ -7,7 +7,7 @@ async function getVidTitle(accessToken) {
   let tab = await browser.tabs.query({currentWindow: true, active: true})  
 
   if(!(tab[0].url).includes('www.youtube.com/watch')) {
-    const text = document.createElement('h3')
+    const text = document.createElement('h1')
     text.textContent = 'Open a Youtube video to search'
     document.getElementById('songNotFound').appendChild(text)
     return null
@@ -76,21 +76,32 @@ async function getVidTitle(accessToken) {
 function displaySong(data, index, accessToken) {
   const art = document.createElement('li')
   const artImg = document.createElement('img')
-  const track = document.createElement('li')
-  const artist = document.createElement('li')
+  const trackArtistWrap = document.createElement('li')
+  const albumWrap = document.createElement('li')
+  const trackArtistList = document.createElement('ul')
+  const track = document.createElement('h2')
+  const artist = document.createElement('h3')
+  const album = document.createElement('h2')
   const button = document.createElement('li')
 
   artImg.src = data.tracks.items[index].album.images[0].url
   track.textContent = data.tracks.items[index].name
   artist.textContent = data.tracks.items[index].album.artists[0].name
+  album.textContent = data.tracks.items[index].album.name
+
+  trackArtistList.appendChild(track)
+  trackArtistList.appendChild(artist)
+  trackArtistWrap.appendChild(trackArtistList)
+  albumWrap.appendChild(album)
+
   button.textContent = '+'
 
   button.addEventListener('click', addToLibrary.bind(null, accessToken, data.tracks.items[index].id))
   
   art.appendChild(artImg)
   document.getElementById('artList').appendChild(art)
-  document.getElementById('trackList').appendChild(track)
-  document.getElementById('artistList').appendChild(artist)  
+  document.getElementById('trackList').appendChild(trackArtistWrap)
+  document.getElementById('albumList').appendChild(albumWrap)
   document.getElementById('buttonList').appendChild(button)  
 }
 
@@ -117,7 +128,7 @@ async function getSpotifyInfo(accessToken, searchOBJ) {
       case 1: autoRefine(accessToken, searchOBJ); break
       case 2: finalRefine(accessToken, searchOBJ); break
       case 3: {
-        const text = document.createElement('h3')
+        const text = document.createElement('h1')
         text.textContent = 'No song found'
         document.getElementById('songNotFound').appendChild(text)
         break
@@ -126,8 +137,8 @@ async function getSpotifyInfo(accessToken, searchOBJ) {
     }
   } else {
     document.getElementById('artHead').textContent = '( ͡° ͜ʖ ͡°)'
+    document.getElementById('albumHead').textContent = 'ALBUM'
     document.getElementById('trackHead').textContent = 'TRACK'
-    document.getElementById('artistHead').textContent = 'ARTIST'
     document.getElementById('buttonHead').textContent = '( ͡° ͜ʖ ͡°)'
     document.getElementById('spotLogo').style.display = 'block'
   }
@@ -162,14 +173,14 @@ async function addToLibrary(accessToken, trackID) {
   let text
   switch(promise.status) {
     case 200:
-      text = document.createElement('h3')
+      text = document.createElement('h1')
       text.textContent = 'Added to Liked Songs'
       document.getElementById('wrapper').style.display = 'none'
-      document.getElementById('songNotFound').appendChild(text)
+      document.getElementById('songAdded').appendChild(text)
       break
     default:
-      text = document.createElement('h3')
-      text.textContent = 'Failed to add song to Liked Songs'
+      text = document.createElement('h1')
+      text.textContent = 'Failed to add song'
       document.getElementById('wrapper').style.display = 'none'
       document.getElementById('songNotFound').appendChild(text)
       break
