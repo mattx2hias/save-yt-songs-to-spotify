@@ -74,16 +74,21 @@ async function getVidTitle(accessToken) {
  * @param {*} accessToken 
  */
 function displaySong(data, index, accessToken) {
+  const art = document.createElement('li')
+  const artImg = document.createElement('img')
   const track = document.createElement('li')
   const artist = document.createElement('li')
   const button = document.createElement('li')
 
-  track.textContent = data.tracks.items[0].name
-  artist.textContent = data.tracks.items[0].album.artists[0].name
+  artImg.src = data.tracks.items[index].album.images[0].url
+  track.textContent = data.tracks.items[index].name
+  artist.textContent = data.tracks.items[index].album.artists[0].name
   button.textContent = '+'
 
   button.addEventListener('click', addToLibrary.bind(null, accessToken, data.tracks.items[index].id))
-
+  
+  art.appendChild(artImg)
+  document.getElementById('artList').appendChild(art)
   document.getElementById('trackList').appendChild(track)
   document.getElementById('artistList').appendChild(artist)  
   document.getElementById('buttonList').appendChild(button)  
@@ -120,6 +125,7 @@ async function getSpotifyInfo(accessToken, searchOBJ) {
       default: return null
     }
   } else {
+    document.getElementById('artHead').textContent = '( ͡° ͜ʖ ͡°)'
     document.getElementById('trackHead').textContent = 'TRACK'
     document.getElementById('artistHead').textContent = 'ARTIST'
     document.getElementById('buttonHead').textContent = '( ͡° ͜ʖ ͡°)'
@@ -130,6 +136,7 @@ async function getSpotifyInfo(accessToken, searchOBJ) {
   if(data.tracks.items.length < numOfResults) numOfResults = data.tracks.items.length
 
   for(let i = 0; i < numOfResults; i++) {
+    if(i > 0 && data.tracks.items[i].name == data.tracks.items[i-1].name) break // don't display duplicates in popup
     displaySong(data, i, accessToken)
   }
 }
@@ -156,13 +163,13 @@ async function addToLibrary(accessToken, trackID) {
   switch(promise.status) {
     case 200:
       text = document.createElement('h3')
-      text.textContent = 'Song added to library'
+      text.textContent = 'Added to Liked Songs'
       document.getElementById('wrapper').style.display = 'none'
       document.getElementById('songNotFound').appendChild(text)
       break
     default:
       text = document.createElement('h3')
-      text.textContent = 'Failed to add song to library'
+      text.textContent = 'Failed to add song to Liked Songs'
       document.getElementById('wrapper').style.display = 'none'
       document.getElementById('songNotFound').appendChild(text)
       break
