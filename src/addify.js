@@ -35,7 +35,7 @@ async function getVidTitle(accessToken) {
                         .replace(/(\(|\[)audio(\)|\])/i, '')
   searchOBJ.refineSearchNum = 1
 
-  console.log('pass 1: ' + searchOBJ.searchParam)
+  //console.log('pass 1: ' + searchOBJ.searchParam)
   getSpotifyInfo(accessToken, searchOBJ);
 }
 
@@ -48,7 +48,7 @@ async function getVidTitle(accessToken) {
                                                 .replace(/((nightcore|night\score)\s(mix)?)/i, '')
                                                 .replace(/version/i, '')
   searchOBJ.refineSearchNum = 2
-  console.log('pass 2: ' + searchOBJ.searchParam)
+  //console.log('pass 2: ' + searchOBJ.searchParam)
   getSpotifyInfo(accessToken, searchOBJ)
 }
 
@@ -63,7 +63,7 @@ async function getVidTitle(accessToken) {
                         .replace(/[^a-zA-Z0-9]/g,' ')
                         .replace(/lyrics/i, '')
   searchOBJ.refineSearchNum = 3
-  console.log('final pass: ' + searchOBJ.searchParam)
+  //console.log('final pass: ' + searchOBJ.searchParam)
   getSpotifyInfo(accessToken, searchOBJ)
 }
 
@@ -140,7 +140,7 @@ async function getSpotifyInfo(accessToken, searchOBJ) {
     document.getElementById('albumHead').textContent = 'ALBUM'
     document.getElementById('trackHead').textContent = 'TRACK'
     document.getElementById('buttonHead').textContent = '( ͡° ͜ʖ ͡°)'
-    document.getElementById('spotLogo').style.display = 'block'
+    document.getElementById('spotLogo').style.display = 'flex'
   }
 
   let numOfResults = 3

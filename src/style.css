@@ -18,12 +18,17 @@ body {
     background-color: var(--clr-black);
     font-family: Prime-Regular;
 }
-.column {
-    float: left;
+/*  */
+#songNotFound {
+    margin: 10px;
+    color: var(--clr-blue);
 }
-ul {
-    list-style-type: none;
+#songAdded {
+    margin: 10px;
+    color: var(--clr-green);
+    font-size: 20px;
 }
+
 /* Song not found */
 h1 {
     font-size: 20px;
@@ -43,61 +48,74 @@ h4 {
     text-align: center;
     font-size: 10px;
 }
-#songAdded {
-    margin: 10px;
-    color: var(--clr-green);
-    font-size: 20px;
-}
-.textList > li{
-    height: 53px;
-    overflow: hidden;
-    white-space: nowrap;
-    color: var(--clr-white);
-    max-width: 300px;
-    margin-left: 25px;
-}
-#albumList > li, #buttonList > li {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-}
-li > img {
-    height: 50px;
-    width: 50px;
-}
-a > img {
-    height: 21px;
-    width: 70px;
-    margin-top: 10px;
-}
 .invisibleHeader {
     color: var(--clr-black);
 }
 .visibleHeader {
     color: var(--clr-grey);
 }
-#buttonList {
-    margin-right: 3px;
-    margin-left: 15px;
+/* LISTS */
+.column {
+    display: inline-block;
+}
+ul {
+    list-style-type: none;
+}
+li {
+    height: 50px;
+    overflow: hidden;
+    white-space: nowrap;
+    color: var(--clr-white);
+    max-width: 300px;
+    margin-top: 5px;
+}
+li > img {
+    height: 50px;
+    width: 50px;
 }
 #artList {
-    margin-left: 3px;
+    margin-left: 6px;
 }
-#spotLogo {
+.textList {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+#albumList > li {
     text-align: center;
-    display: none;
+    line-height: 50px;
 }
+
+/* BUTTONS */
 #buttonList li {
     font-family: sans-serif;
-    font-size: 50px;
+    font-size: 40px;
     color: var(--clr-green);
 }
 #buttonList li:hover {
     color: var(--clr-red);
     cursor: pointer;
 }
-#songNotFound {
-    margin: 10px;
-    color: var(--clr-blue);
+#buttonList {
+    margin-right: 6px;
+    margin-left: 15px;
 }
+
+/* FOOTER */
+#spotLogo {
+    width: 100%;
+    display: none;
+    flex-flow: row;
+    justify-content:center;
+    align-items:center;
+}
+a > img {
+    height: 21px;
+    width: 70px;
+}
+hr {
+    flex: 1;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+/* TEST CSS BELOW*/
