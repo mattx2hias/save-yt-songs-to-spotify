@@ -54,6 +54,9 @@ h4 {
 .visibleHeader {
     color: var(--clr-grey);
 }
+#wrapper {
+    display: none;
+}
 /* LISTS */
 .column {
     display: inline-block;
@@ -116,6 +119,7 @@ hr {
     flex: 1;
     margin-left: 5%;
     margin-right: 5%;
+    color: var(--clr-grey);
 }
 
 /* TEST CSS BELOW*/

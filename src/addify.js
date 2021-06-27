@@ -141,6 +141,7 @@ async function getSpotifyInfo(accessToken, searchOBJ) {
     document.getElementById('trackHead').textContent = 'TRACK'
     document.getElementById('buttonHead').textContent = '( ͡° ͜ʖ ͡°)'
     document.getElementById('spotLogo').style.display = 'flex'
+    document.getElementById('wrapper').style.display = 'block'
   }
 
   let numOfResults = 3
