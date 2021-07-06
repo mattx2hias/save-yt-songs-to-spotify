@@ -74,7 +74,8 @@ async function getVidTitle(accessToken) {
  * @param {*} accessToken 
  */
 function displaySong(data, index, accessToken) {
-  const art = document.createElement('li')
+  const artWrap = document.createElement('li')
+  const artImg = document.createElement('img')
   const trackArtistWrap = document.createElement('li')
   const albumWrap = document.createElement('li')
   const trackArtistList = document.createElement('ul')
@@ -82,13 +83,14 @@ function displaySong(data, index, accessToken) {
   const artist = document.createElement('h3')
   const album = document.createElement('h2')
   const button = document.createElement('li')
-  
-  art.innerHTML = `<img src=${data.tracks.items[index].album.images[0].url} />`
-  DOMPurify.sanitize(art)
+
+  artImg.src = data.tracks.items[index].album.images[0].url
+  const cleanArt = DOMPurify.sanitize(artImg)
   track.textContent = data.tracks.items[index].name
   artist.textContent = data.tracks.items[index].album.artists[0].name
   album.textContent = data.tracks.items[index].album.name
 
+  artWrap.innerHTML = cleanArt
   trackArtistList.append(track, artist)
   trackArtistWrap.appendChild(trackArtistList)
   albumWrap.appendChild(album)
@@ -96,7 +98,7 @@ function displaySong(data, index, accessToken) {
   button.textContent = '+'
   button.addEventListener('click', addToLibrary.bind(null, accessToken, data.tracks.items[index].id))
   
-  document.getElementById('artList').appendChild(art)
+  document.getElementById('artList').appendChild(artWrap)
   document.getElementById('trackList').appendChild(trackArtistWrap)
   document.getElementById('albumList').appendChild(albumWrap)
   document.getElementById('buttonList').appendChild(button)  
