@@ -4,14 +4,14 @@
  */
 
 const clientID = '97c3e5d4f7e142f7b11c0daf2b19793d'
-const redirectURI = 'https://www.spotify.com'
+const redirectURI = 'https://www.spotify.com/callback/'
  
  /**
   * Retrieve browser's local storage and checks if it has the authorization code
   */
 async function getStoredSettings() {
   const browStore = await browser.storage.local.get()
-
+  //console.log(browStore.authorization_code);
   if (browStore.authorization_code === undefined) {
     openAuthorizationPrompt()
   } else if (browStore.refresh_token === undefined) {
@@ -32,6 +32,7 @@ async function openAuthorizationPrompt() {
 
   browser.storage.local.set({code_verifier: codeVerifier})
   browser.storage.local.set({state: randomState})
+  
   // wait for script to save the above to local storage
   const s = await browser.storage.local.get()
 
