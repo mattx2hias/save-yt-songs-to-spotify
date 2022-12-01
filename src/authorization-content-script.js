@@ -9,7 +9,7 @@ async function getAuthorizationCode() {
     const browStore = await browser.storage.local.get()
 
     if(state == browStore.state) {
-        let authorizationCode = url.substring(url.indexOf('code=')+5, (url.indexOf('&state') - (url.indexOf('code=')+5)))
+        let authorizationCode = url.substring(url.indexOf('code=')+5, url.indexOf('&state'))
         browser.storage.local.set({authorization_code: authorizationCode})
         alert('Authorization successful. Open a Youtube video to search.')
     } else {
