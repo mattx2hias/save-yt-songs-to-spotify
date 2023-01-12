@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
-    "name": "yt-to-spotify",
-    "version": "1.6.6",
-    "description": "Searches Spotify with Youtube video title and displays results in the popup where they can be added to your Spotify library.",
+    "name": "Save YT Songs To Spotify",
+    "version": "1.6.7",
+    "description": "Searches Spotify with Youtube video title and displays results in the popup where they can be saved to your Spotify library.",
     "icons": {
         "96": "assets/icons/toolbar-icon-96.png",
         "48": "assets/icons/toolbar-icon-48.png"
@@ -22,7 +22,7 @@
             "48": "assets/icons/toolbar-icon-48.png",
             "32": "assets/icons/toolbar-icon-32.png"
         },
-        "default_title": "yt-to-spotify",
+        "default_title": "Save YT Songs To Spotify",
         "default_popup": "src/index.html"
     }
 }

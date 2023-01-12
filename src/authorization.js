@@ -10,13 +10,16 @@ const redirectURI = 'https://www.spotify.com/callback/'
   * Retrieve browser's local storage and checks if it has the authorization code
   */
 async function getStoredSettings() {
+  //console.log('get stored settings')
   const browStore = await browser.storage.local.get()
-  //console.log(browStore.authorization_code);
   if (browStore.authorization_code === undefined) {
+    //console.log('auth prompt')
     openAuthorizationPrompt()
   } else if (browStore.refresh_token === undefined) {
+    //console.log('get refresh token')
     getRefreshToken()
   } else {
+    //console.log('refresh access token')
     refreshAccessToken()
   }
 }
@@ -51,7 +54,6 @@ async function openAuthorizationPrompt() {
  */
 async function getRefreshToken() {
   const browStore = await browser.storage.local.get()
-
   const res = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -64,7 +66,6 @@ async function getRefreshToken() {
   const data = await res.json()
   const accessToken = data.access_token
   const refreshToken = data.refresh_token
-
   browser.storage.local.set({refresh_token: refreshToken})
   getVidTitle(accessToken)
 }

@@ -4,6 +4,7 @@
  * @param {*} accessToken 
  */
 async function getVidTitle(accessToken) {
+  //console.log('get vid title')
   let tab = await browser.tabs.query({currentWindow: true, active: true})  
 
   if(!(tab[0].url).includes('www.youtube.com/watch')) {
@@ -85,12 +86,12 @@ function displaySong(data, index, accessToken) {
   const button = document.createElement('li')
 
   artImg.src = data.tracks.items[index].album.images[0].url
-  const cleanArt = DOMPurify.sanitize(artImg)
   track.textContent = data.tracks.items[index].name
   artist.textContent = data.tracks.items[index].album.artists[0].name
   album.textContent = data.tracks.items[index].album.name
 
-  artWrap.innerHTML = cleanArt
+  DOMPurify.sanitize(artImg)
+  artWrap.appendChild(artImg)
   trackArtistList.append(track, artist)
   trackArtistWrap.appendChild(trackArtistList)
   albumWrap.appendChild(album)

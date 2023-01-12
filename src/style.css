@@ -87,6 +87,9 @@ li > img {
     text-align: center;
     line-height: 50px;
 }
+#trackList > li {
+    text-align: center;
+}
 
 /* BUTTONS */
 #buttonList li {
