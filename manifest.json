@@ -9,7 +9,7 @@
     },
     "content_scripts": [
         {
-            "matches": ["https://www.spotify.com/*/callback/?code=*"],
+            "matches": ["https://github.com/qpco/save-yt-songs-to-spotify/?code=*"],
             "js": ["src/authorization-content-script.js"]
         }
     ],
