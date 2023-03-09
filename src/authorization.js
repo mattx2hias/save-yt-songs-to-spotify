@@ -4,7 +4,7 @@
  */
 
 const clientID = '97c3e5d4f7e142f7b11c0daf2b19793d'
-const redirectURI = 'https://github.com/qpco/save-yt-songs-to-spotify/'
+const redirectURI = 'https://github.com/mattx2hias/save-yt-songs-to-spotify/'
  
  /**
   * Retrieve browser's local storage and checks if it has the authorization code

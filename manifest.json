@@ -9,7 +9,7 @@
     },
     "content_scripts": [
         {
-            "matches": ["https://github.com/mattx2hias/save-yt-songs-to-spotify?code=*"],
+            "matches": ["https://github.com/mattx2hias/save-yt-songs-to-spotify/?code=*"],
             "js": ["src/authorization-content-script.js"]
         }
     ],
