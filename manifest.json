@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Save YT Songs To Spotify",
-    "version": "1.6.9",
+    "version": "1.6.10",
     "description": "Searches Spotify with Youtube video title and displays results in the popup where they can be saved to your Spotify library.",
     "icons": {
         "96": "assets/icons/toolbar-icon-96.png",

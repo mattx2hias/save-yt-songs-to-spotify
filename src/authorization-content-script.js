@@ -11,9 +11,9 @@ async function getAuthorizationCode() {
     if(state == browStore.state) {
         let authorizationCode = url.substring(url.indexOf('code=')+5, url.indexOf('&state'))
         browser.storage.local.set({authorization_code: authorizationCode})
-        //alert('Authorization successful. Open a Youtube video to search.')
+        alert('Authorization successful. Open a Youtube video to search.')
     } else {
-        //alert('Failed state parity. Ending authentication flow.')
+        alert('Failed state parity. Ending authentication flow.')
         return null
     }
 }

@@ -10,16 +10,12 @@ const redirectURI = 'https://github.com/mattx2hias/save-yt-songs-to-spotify/'
   * Retrieve browser's local storage and checks if it has the authorization code
   */
 async function getStoredSettings() {
-  //console.log('get stored settings')
   const browStore = await browser.storage.local.get()
   if (browStore.authorization_code === undefined) {
-    //console.log('auth prompt')
     openAuthorizationPrompt()
   } else if (browStore.refresh_token === undefined) {
-    //console.log('get refresh token')
     getRefreshToken()
   } else {
-    //console.log('refresh access token')
     refreshAccessToken()
   }
 }
